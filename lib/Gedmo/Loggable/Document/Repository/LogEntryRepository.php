@@ -81,8 +81,24 @@ class LogEntryRepository extends DocumentRepository
         $qb = $this->createQueryBuilder();
         $qb->field('objectId')->equals($objectId);
         $qb->field('objectClass')->equals($objectMeta->name);
-        $qb->field('version')->lte(intval($version));
-        $qb->sort('version', 'ASC');
+        $qb->field('version')->equals(intval($version));
+        $qb->sort('version', '
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        ');
         $q = $qb->getQuery();
 
         $logs = $q->execute();
@@ -93,6 +109,9 @@ class LogEntryRepository extends DocumentRepository
             $data = array();
             while (($log = array_shift($logs))) {
                 $logData = $log->getData();
+
+                $this->test($logData);
+
                 foreach ($logData as $field => $value) {
                     if ($value && $wrapped->isEmbeddedCollectionAssociation($field)) {
                         foreach ($value as $i => $item) {
@@ -106,6 +125,23 @@ class LogEntryRepository extends DocumentRepository
         } else {
             throw new \Gedmo\Exception\UnexpectedValueException('Count not find any log entries under version: '.$version);
         }
+    }
+
+
+    protected function test(&$value) {
+
+        if(is_array($value)) {
+            foreach($value as $key=>$tmp) {
+                $value[$key] = $this->test($value[$key]);
+            }
+        }
+
+        if(is_string($value)) {
+            $value = @unserialize($value);
+        }
+
+        return $value;
+
     }
 
     /**

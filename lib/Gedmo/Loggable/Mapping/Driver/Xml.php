@@ -27,17 +27,24 @@ class Xml extends BaseXml
          * @var \SimpleXmlElement $xml
          */
         $xml = $this->_getMapping($meta->name);
+
+
         $xmlDoctrine = $xml;
 
         $xml = $xml->children(self::GEDMO_NAMESPACE_URI);
 
-        if ($xmlDoctrine->getName() == 'entity' || $xmlDoctrine->getName() == 'document' || $xmlDoctrine->getName() == 'mapped-superclass') {
+
+        if ($xmlDoctrine->getName() == 'embedded-document' || $xmlDoctrine->getName() == 'entity' || $xmlDoctrine->getName() == 'document' || $xmlDoctrine->getName() == 'mapped-superclass') {
             if ($xml->count() > 0 && isset($xml->loggable)) {
                 /**
                  * @var \SimpleXMLElement $data;
                  */
                 $data = $xml->loggable;
                 $config['loggable'] = true;
+
+
+
+
                 if ($this->_isAttributeSet($data, 'log-entry-class')) {
                     $class = $this->_getAttribute($data, 'log-entry-class');
                     if (!$cl = $this->getRelatedClassName($meta, $class)) {
@@ -47,6 +54,7 @@ class Xml extends BaseXml
                 }
             }
         }
+
 
         if (isset($xmlDoctrine->field)) {
             $this->inspectElementForVersioned($xmlDoctrine->field, $config, $meta);
@@ -63,12 +71,17 @@ class Xml extends BaseXml
         if (isset($xmlDoctrine->{'embedded'})) {
             $this->inspectElementForVersioned($xmlDoctrine->{'embedded'}, $config, $meta);
         }
+        if (isset($xmlDoctrine->{'embed-one'})) {
+            $this->inspectElementForVersioned($xmlDoctrine->{'embed-one'}, $config, $meta);
+        }
 
         if (!$meta->isMappedSuperclass && $config) {
             if (is_array($meta->identifier) && count($meta->identifier) > 1) {
                 throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
             }
             if (isset($config['versioned']) && !isset($config['loggable'])) {
+
+
                 throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
             }
         }

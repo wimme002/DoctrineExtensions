@@ -143,6 +143,8 @@ class LoggableListener extends MappedEventSubscriber
         $om = $ea->getObjectManager();
         $oid = spl_object_hash($object);
         $uow = $om->getUnitOfWork();
+
+
         if ($this->pendingLogEntryInserts && array_key_exists($oid, $this->pendingLogEntryInserts)) {
             $wrapped = AbstractWrapper::wrap($object, $om);
 
@@ -267,6 +269,9 @@ class LoggableListener extends MappedEventSubscriber
                     }
                 }
             }
+            if(is_object($value)) {
+                $value = serialize($value);
+            }
             $newValues[$field] = $value;
         }
 
@@ -314,6 +319,7 @@ class LoggableListener extends MappedEventSubscriber
             $newValues = array();
             if ($action !== self::ACTION_REMOVE && isset($config['versioned'])) {
                 $newValues = $this->getObjectChangeSetData($ea, $object, $logEntry);
+
                 $logEntry->setData($newValues);
             }
 

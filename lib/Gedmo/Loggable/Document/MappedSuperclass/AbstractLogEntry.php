@@ -58,7 +58,8 @@ abstract class AbstractLogEntry
     /**
      * @var string $data
      *
-     * @MongoODM\Hash(nullable=true)
+     * @MongoODM\Field(type="hash")
+     *
      */
     protected $data;
 
